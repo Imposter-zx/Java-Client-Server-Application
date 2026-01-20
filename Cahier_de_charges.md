@@ -1,55 +1,58 @@
-# Cahier de Charges : Application Client-Serveur Java Sécurisée
+# Cahier de Charges : Pro Authentication Suite v2.5
 
-## 1. Présentation du Projet
+## 1. Objectifs du Projet
 
-Ce projet consiste en une application Client-Serveur robuste développée en Java, permettant l'authentification sécurisée des utilisateurs via une architecture réseau TCP et une base de données MySQL.
+Développer une application Client-Serveur Java hautement sécurisée et facile à déployer, permettant une gestion centralisée des utilisateurs via une architecture réseau TCP et une persistance MySQL.
 
-## 2. Objectifs
+## 2. Spécifications Fonctionnelles
 
-- Fournir une plateforme d'authentification robuste.
-- Assurer la gestion simultanée de plusieurs clients (Multi-threading).
-- Implémenter des standards de sécurité modernes (Hachage de mots de passe).
-- Offrir une interface utilisateur console intuitive et dynamique.
+### 2.1. Gestion des Utilisateurs
 
-## 3. Spécifications Fonctionnelles
+- **Enregistrement** : Création de compte avec vérification d'unicité du pseudonyme.
+- **Authentification** : Connexion sécurisée avec validation par hash.
+- **Gestion de Session** : Attribution d'un ID de session unique (UUID) à chaque connexion.
+- **Changement de Mot de Passe** : Mise à jour sécurisée nécessitant l'ancien mot de passe.
+- **Déconnexion (Logout)** : Permet de quitter la session active sans fermer l'application client.
 
-### 3.1. Serveur
+### 2.2. Interface Utilisateur (UX)
 
-- **Écoute Réseau** : Le serveur doit écouter sur le port 5000.
-- **Multi-threading** : Capacité à gérer plusieurs connexions client en parallèle.
-- **Authentification** : Vérification des identifiants par rapport à une base de données MySQL.
-- **Protocole** : Support des commandes :
-  - `LOGIN <user> <pass>` : Authentification.
-  - `STATUS` : Informations sur la session actuelle.
-  - `EXIT` : Déconnexion propre.
+- Interface console interactive avec couleurs ANSI.
+- Simulations de chargement pour une meilleure réactivité perçue.
+- Bannières ASCII dynamiques pour le branding (CLIENT vs SERVER).
 
-### 3.2. Client
+## 3. Spécifications Techniques
 
-- **Interface Console** : Menu interactif.
-- **Communication** : Envoi de commandes au serveur et affichage des réponses.
-- **UX** : Utilisation de couleurs ANSI et de bannières ASCII pour une meilleure visibilité.
+### 3.1. Architecture Logicielle
 
-## 4. Spécifications Techniques
+- **Multi-module Maven** :
+  - `parent-project` : Gestion globale.
+  - `server` : Logique métier et accès DB.
+  - `client` : Interface utilisateur et communication réseau.
+- **Réseau** : Communication bidirectionnelle via Sockets TCP sur le port 5000.
+- **Multi-threading** : Un thread par client via `ClientHandler.java`.
 
-- **Langage** : Java 17.
-- **Base de Données** : MySQL 8.0+.
-- **Connectivité** : JDBC (Java Database Connectivity).
-- **Gestionnaire de Projet** : Maven.
-- **Sécurité** :
-  - Hachage SHA-256 pour les mots de passe.
-  - `PreparedStatement` pour prévenir les injections SQL.
+### 3.2. Sécurité
 
-## 5. Architecture
+- **Chiffrement** : Hachage unidirectionnel **SHA-256**.
+- **Sécurité SQL** : Utilisation systématique de `PreparedStatement` pour bloquer les injections.
+- **Session** : IDs de session aléatoires de 8 caractères.
 
-```mermaid
-graph TD
-    Client[Client Console] <-->|TCP Sockets| Server[Serveur Java]
-    Server <-->|JDBC| MySQL[(Base de données MySQL)]
-```
+### 3.3. Automatisation & Déploiement
 
-## 6. Livrables
+- **Scripts de Lancement** :
+  - `run_all.bat` : Auto-détection de Java/Maven, configuration `JAVA_HOME` dynamique, compilation et lancement simultané.
+  - `setup_db.bat` : Initialisation automatique du schéma MySQL avec détection du chemin binaire.
 
-- Code source complet (Modules Client et Serveur).
-- Script SQL de création de base de données.
-- Documentation technique et manuel d'utilisation (README.md).
-- Cahier de charges fonctionnel.
+## 4. Environnement Requis
+
+- **JDK** : Microsoft OpenJDK 17.
+- **Build tool** : Maven 3.9.6.
+- **Database** : MySQL 8.4 Server.
+- **OS** : Windows (Scripts batch optimisés).
+
+## 5. Livrables
+
+1. Code source modulaire complet.
+2. Scripts PowerShell/Batch d'automatisation.
+3. Schéma SQL d'initialisation (`schema.sql`).
+4. Documentation utilisateur exhaustive (README.md).
