@@ -10,11 +10,11 @@ public class Client {
 
     public static void main(String[] args) {
         printBanner();
-        
+
         try (Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
-             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-             Scanner scanner = new Scanner(System.in)) {
+                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                Scanner scanner = new Scanner(System.in)) {
 
             ConsoleColors.println(ConsoleColors.GREEN, "[*] Connected to High-Security Auth Server.");
 
@@ -68,6 +68,11 @@ public class Client {
             return;
         }
 
+        if (username.contains(" ")) {
+            ConsoleColors.println(ConsoleColors.RED, "[!] Username cannot contain spaces.");
+            return;
+        }
+
         out.println("LOGIN " + username + " " + password);
         String response = in.readLine();
         displayResponse(response);
@@ -82,6 +87,11 @@ public class Client {
 
         if (username.isBlank() || password.isBlank()) {
             ConsoleColors.println(ConsoleColors.RED, "[!] Fields cannot be empty.");
+            return;
+        }
+
+        if (username.contains(" ")) {
+            ConsoleColors.println(ConsoleColors.RED, "[!] Username cannot contain spaces.");
             return;
         }
 
@@ -122,12 +132,14 @@ public class Client {
                 Thread.sleep(300);
                 System.out.print(".");
             }
-        } catch (InterruptedException ignored) {}
+        } catch (InterruptedException ignored) {
+        }
         System.out.println(ConsoleColors.RESET);
     }
 
     private static void displayResponse(String response) {
-        if (response == null) return;
+        if (response == null)
+            return;
         if (response.startsWith("SUCCESS") || response.startsWith("INFO")) {
             ConsoleColors.println(ConsoleColors.GREEN, ">>> " + response);
         } else {
@@ -136,15 +148,15 @@ public class Client {
     }
 
     private static void printBanner() {
-        String banner = 
-              "   ____ _     ___ _____ _   _ _____ \n" +
-              "  / ___| |   |_ _| ____| \\ | |_   _|\n" +
-              " | |   | |    | ||  _| |  \\| | | |  \n" +
-              " | |___| |___ | || |___| |\\  | | |  \n" +
-              "  \\____|_____|___|_____|_| \\_| |_|  \n" +
-              "                                    ";
-        ConsoleColors.println(ConsoleColors.CYAN, banner);
-        ConsoleColors.println(ConsoleColors.RESET, "--- Terminal Secure Access Node v1.0 ---");
+        String banner = "   ____ _     ___ _____ _   _ _____ \n" +
+                "  / ___| |   |_ _| ____| \\ | |_   _|\n" +
+                " | |   | |    | ||  _| |  \\| | | |  \n" +
+                " | |___| |___ | || |___| |\\  | | |  \n" +
+                "  \\____|_____|___|_____|_| \\_| |_|  \n" +
+                "                                    ";
+        ConsoleColors.println(ConsoleColors.CYAN_BOLD, banner);
+        ConsoleColors.println(ConsoleColors.WHITE_BOLD, "--- PRO Terminal Secure Access Node v2.5 ---");
+        ConsoleColors.println(ConsoleColors.RESET, "--- Professional Authentication Suite ---");
     }
 
     private static void printMenu() {

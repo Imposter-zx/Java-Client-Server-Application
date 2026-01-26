@@ -16,21 +16,23 @@ public class ClientHandler implements Runnable {
     private String authenticatedUser = null;
     private final String sessionId;
     private long connectionTime;
+    private long lastActivity;
 
     public ClientHandler(Socket socket) {
         this.clientSocket = socket;
         this.sessionId = java.util.UUID.randomUUID().toString().substring(0, 8);
         this.connectionTime = System.currentTimeMillis();
+        this.lastActivity = System.currentTimeMillis();
     }
 
     @Override
     public void run() {
         try (
-            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)
-        ) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
+                this.lastActivity = System.currentTimeMillis();
                 String[] parts = inputLine.split(" ", 3);
                 String command = parts[0].toUpperCase();
 
@@ -129,11 +131,13 @@ public class ClientHandler implements Runnable {
 
     private void handleStatus(PrintWriter out) {
         long duration = (System.currentTimeMillis() - connectionTime) / 1000;
-        String status = String.format("USER: %s | SESSION: %s | TIME: %ds | IP: %s", 
-            (authenticatedUser != null ? authenticatedUser : "GUEST"),
-            sessionId,
-            duration,
-            clientSocket.getInetAddress().getHostAddress());
+        long inactive = (System.currentTimeMillis() - lastActivity) / 1000;
+        String status = String.format("USER: %s | SESSION: %s | UPTIME: %ds | IDLE: %ds | IP: %s",
+                (authenticatedUser != null ? authenticatedUser : "GUEST"),
+                sessionId,
+                duration,
+                inactive,
+                clientSocket.getInetAddress().getHostAddress());
         out.println("INFO: " + status);
     }
 
@@ -141,10 +145,10 @@ public class ClientHandler implements Runnable {
         // We hash the incoming password to compare with the DB hash
         String hashedPassword = SecurityUtils.hashPassword(password);
         String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
-        
+
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setString(1, username);
             pstmt.setString(2, hashedPassword);
 
@@ -162,8 +166,8 @@ public class ClientHandler implements Runnable {
         String sql = "INSERT INTO users (username, password) VALUES (?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setString(1, username);
             pstmt.setString(2, hashedPassword);
 
@@ -182,8 +186,8 @@ public class ClientHandler implements Runnable {
         String sql = "UPDATE users SET password = ? WHERE username = ? AND password = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setString(1, hashedNew);
             pstmt.setString(2, username);
             pstmt.setString(3, hashedOld);

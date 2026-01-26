@@ -1,6 +1,13 @@
-# Enhanced Java Client-Server Application (v2.0)
+# Pro Authentication Suite (v2.5)
 
-A multi-threaded Java application featuring secure authentication, professional console UI, and interactive commands.
+A professional-grade multi-threaded Java application featuring enterprise-level secure authentication, enhanced session tracking, and a rich console UI.
+
+## ✨ New in v2.5
+
+- **Enterprise Branding**: Professional ASCII banners and bold color schemes.
+- **Advanced Session Tracking**: Real-time Uptime and Idle metrics via the `STATUS` command.
+- **Robust Input Validation**: Strict checks on usernames (no spaces) and mandatory field validation.
+- **Improved UX**: Dynamic loading simulations for a smoother terminal experience.
 
 ## 🚀 Simple Run (Recommended)
 
